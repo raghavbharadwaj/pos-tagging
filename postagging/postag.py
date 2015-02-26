@@ -1,86 +1,51 @@
 import sys
 import os
 import json
-import operator
-import random
-fcontents = open(sys.argv[1],'r')
-words = []
-weights = {}
-def changeweight(prevword,curword,nexword,predpos,curpos,weights,labels):
-	weights[predpos][prevword]-=1
-	weights[predpos][curword]-=1
-	weights[predpos][nexword]-=1
-	weights[curpos][prevword]+=1
-	weights[curpos][curword]+=1
-	weights[curpos][nexword]+=1
+import io
+fjson = open(sys.argv[1],'r')
+weights = json.load(fjson)
+data = io.open(sys.stdin.fileno(),'r',encoding='latin-1')
 
-
-def initialize(weights,labels,average):
-	for label in labels:
-		weights[label]={}
-		average[label]={}
-	features = open (sys.argv[1],'r')
-	for line in features:
-		flist = line.split()
-		for label in labels:
-			if flist[1] not in weights[label]:
-				weights[label][flist[1]]=0
-			if flist[2] not in weights[label]:
-				weights[label][flist[2]]=0
-			if flist[3] not in weights[label]:
-				weights[label][flist[3]]=0
-	features.close()
-	 	
-def wordclass(prevword,curword,nexword,weights,labels):
-	pred_label_sum=0
-	for label in labels:
-		temp_label_sum = weights[label][prevword] + weights[label][curword]+weights[label][nexword]
-		if temp_label_sum >= pred_label_sum:
-			pred_label_sum=temp_label_sum
+def wordclass(prevword,curword,nexword,weights):
+	pred_sum=0
+	pred_label=""
+	for label in weights.keys():
+		temp_sum=0
+		if prevword in weights[label]:
+			temp_sum += weights[label][prevword]
+		if curword in weights[label]:
+			temp_sum +=weights[label][curword]
+		if nexword in weights[label]:
+			temp_sum +=weights[label][nexword]
+		if temp_sum >= pred_sum:
+			pred_sum = temp_sum
 			pred_label=label
 	return pred_label
-def devwordclass(prevword,curword,nexword,weights,labels):
-        for label in labels:
-                pred_label_sum=0
-                temp_label_sum = weights[label][prevword] + weights[label][curword]+weights[label][nexword]
-                if temp_label_sum >= pred_label_sum:
-                        pred_label_sum=temp_label_sum
-                        pred_label=label
-        return pred_label
+def dev(weights,line):
+	outputline=''
+	for feature in line:
+		words = feature.split()
+		prevword=words[0]
+		nexword=words[2]
+		curword=words[1]
+		pred_pos=wordclass(prevword,curword,nexword,weights)
+		outputline+=curword.split(':')[1]+'/'+pred_pos+' '
+	print(outputline)
+def makefeature():
+	for inputline in  io.open(sys.stdin.fileno(),'r',encoding='latin-1'):
+		words = []
+		line=[]
+		words = inputline.split()
+		words = [ 'BOS' ] + words + [ 'EOS' ]
+		fout = open('feature_output.txt','w+')
+		for i in range(1,len(words)-1):
+			label = words[i].rsplit('/',1)
+			newwords = ''
+			newwords +="prev:"+words[i-1].rsplit('/',1)[0]+" cur:"+words[i].rsplit('/',1)[0]+" nex:"+words[i+1].rsplit('/',1)[0]
+			line.append(newwords)
+		dev(weights,line)
+       
+makefeature()
 
 
-flabels = open(sys.argv[1],'r')
-labels = []
-for line in flabels:
-	label = line.split()[0]
-	if label not in labels:
-		labels.append(label)
-flabels.close()
-average = {}
-def total(weights,average):
-	for key1 in weights.keys():
-		for key2 in weights[key1].keys():
-			average[key1][key2]+=weights[key1][key2]
-fcontents = open(sys.argv[1],'r')
-initialize(weights,labels,average)		
-for i in range(1,15):
-	for line in fcontents:
-		linecontents = line.split()
-		prevword = linecontents[1]
-		nexword = linecontents[3]
-		curword=linecontents[2]
-		curpos = linecontents[0]
-		pred_pos = wordclass(prevword,curword,nexword,weights,labels)
-		if curpos!=pred_pos:
-			changeweight(prevword,curword,nexword,pred_pos,curpos,weights,labels)
-	#total(weights,average)
 
-	#dev(weights)
-	#random.shuffle(words)
-
-#print(average,file=faverage)
-fcontents.close()
-f = open('fdict','w+')
-json.dump(weights,f)
-fcontents.close()
-f.close()
