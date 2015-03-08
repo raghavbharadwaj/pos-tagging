@@ -37,11 +37,11 @@ def makefeature():
 		line=[]
 		words = inputline.split()
 		words = [ 'BOS' ] + words + [ 'EOS' ]
-		fout = open('feature_output.txt','w+')
+		fout = open('feature_output.txt','w+',encoding='latin-1')
 		for i in range(1,len(words)-1):
 			label = words[i].rsplit('/',1)
 			newwords = ''
-			newwords +="prev:"+words[i-1].rsplit('/',1)[0]+" cur:"+words[i].rsplit('/',1)[0]+" nex:"+words[i+1].rsplit('/',1)[0]
+			newwords +="prev:"+words[i-1].rsplit('/',0)[0]+" cur:"+words[i].rsplit('/',0)[0]+" nex:"+words[i+1].rsplit('/',0)[0]
 			line.append(newwords)
 		dev(weights,line)
        

@@ -9,7 +9,7 @@ def main(argv):
 	weights = {}
 	#random.shuffle(words)
 	#print(average,file=faverage)
-	flearn = open(argv[0],'r')
+	flearn = open(argv[0],'r',encoding='latin-1',errors='strict',buffering=1)
 	contents = []
 	for line in flearn:
 		contents.append(line)
@@ -52,7 +52,7 @@ def main(argv):
 				average[key1][key2]+=weights[key1][key2]
 		print("Iteration"+str(i))
 
-	f = open(argv[1],'w+')
+	f = open(argv[1],'w+',encoding='latin-1')
 	json.dump(average,f)
 	f.close()
 if __name__=='__main__':
