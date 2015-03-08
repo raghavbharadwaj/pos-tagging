@@ -1,0 +1,8 @@
+The following Changes have been made post grading
+
+1)ner.esp.test.out
+2)ner/netag.py
+3)perceplearn.py
+
+The changes were made accomodate latin-1 encoding format while reading training and test data.
+
