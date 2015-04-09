@@ -1,0 +1,16 @@
+The following corrections have been made after discussing with Professor in Part-1 of Assignment -3. The changes have been made to make perceplearn.py and percepclassify.py to work as a generic classifier comparable with off the shelf tools like megam perceptron.
+
+Added new folder part-1-corrections and added two files perceplearn.py and percepclassify.py
+	root/
+	    part-1-corrections/
+		              perceplearn.py
+			      percepclassify.py  		 	
+Format to run the programs:
+
+1) python3 perceplearn.py ARG1 MODELFILE
+
+-where ARG1 is the feature extracted input file in the form (LABEL FEATURE1 FEATURE2...FEATURE_N )
+
+2) python3 percepclassify.py MODELFILE <testfile>outputfile
+
+-where test file is the feature extracted output file in the form ( FEATURE1 fEATURE2...FEATURE_N )
